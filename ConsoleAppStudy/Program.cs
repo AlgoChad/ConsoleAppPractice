@@ -1,85 +1,163 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Diagnostics;
+using System.Reflection.Metadata;
 
 class Program
 {
-    static void Main(string[] args)
+    public class Entity
     {
-        // Create a Stopwatch instance
-        Stopwatch stopwatch = new Stopwatch();
-        Stopwatch stopwatch1 = new Stopwatch();
-        int size = 10;
+        public string Name { get; set;}
+        public int randomVal { get; set; }
+    }
 
-        // Seed for the random number generator
+    static async Task Main(string[] args)
+    {
+        await TaskToRun();
+    }
+
+    static async Task TaskToRun()
+    {
+     
+        string[] firstNames = [
+                    "Emma",
+            "Liam",
+            "Olivia",
+            "Noah",
+            "Ava",
+            "Sophia",
+            "Jackson",
+            "Isabella",
+            "Lucas",
+            "Mia",
+            "Aiden",
+            "Amelia",
+            "Elijah",
+            "Harper",
+            "Oliver",
+            "Abigail",
+            "Ethan",
+            "Ella",
+            "Logan",
+            "Scarlett"
+                ];
+
+        string[] lastNames = [
+            "Smith",
+            "Johnson",
+            "Williams",
+            "Jones",
+            "Brown",
+            "Davis",
+            "Miller",
+            "Wilson",
+            "Moore",
+            "Taylor",
+            "Anderson",
+            "Thomas",
+            "Jackson",
+            "White",
+            "Harris",
+            "Martin",
+            "Thompson",
+            "Garcia",
+            "Martinez",
+            "Robinson"
+        ];
+
         Random random = new Random();
 
-        // Array to store random integers
-        int[] array = new int[size];
+        ConcurrentBag<Entity> concurrentEntityList = new ConcurrentBag<Entity>();
 
-        Enumerable.Range(0, size).Select<int, object>(x => { Console.WriteLine(x); return null; });
+        Entity[] objectArray = new Entity[100000];
+        List<Entity> objectList = new List<Entity>();
 
-        // Fill the array with random integers
-        for (int i = 0; i < size; i++)
+        for (int i = 0; i < objectArray.Length; i++)
         {
-            array[i] = random.Next(); // Generate a random integer
+            string first = firstNames[random.Next(firstNames.Length)];
+            string last = lastNames[random.Next(lastNames.Length)];
+
+            objectArray[i]  = new Entity
+            {
+                Name = $"{first} {last}",
+                randomVal = random.Next()
+            };
         }
 
-        int[] array2 = new int[size];
-
-        for (int i = 0; i < size; i++)
+        for (int i = 0; i < 100000; i++)
         {
-            array2[i] = random.Next();
+            string first = firstNames[random.Next(firstNames.Length)];
+            string last = lastNames[random.Next(lastNames.Length)];
+
+            Entity newEntity = new Entity
+            {
+                Name = $"{first} {last}",
+                randomVal = random.Next()
+            };
+
+            objectList.Add(newEntity);
         }
 
-        BubbleSort(array);
+        await Task.Delay(1000);
+        
+        Console.WriteLine("Starting to Sort.");
+
+        Stopwatch listStopWatch= new Stopwatch();
+
+        listStopWatch.Start();
+
+        //var sortedListData = BubbleSort(integerList);
+
+        var sortedObjectList = objectList.OrderBy(n => n.randomVal).ToList();
+
+        listStopWatch.Stop();
+
+        long elapsedMillisecondsOne = listStopWatch.ElapsedMilliseconds;
+
+
+        Stopwatch arrayStopWatch = new Stopwatch();
+
+        arrayStopWatch.Start();
+
+        //var sortedData = BubbleSort(integerArray);
+
+        var sortedObjectArray = objectArray.OrderBy(n => n.randomVal).ToArray();
+
+        arrayStopWatch.Stop();
+
+        long elapsedMilliseconds = arrayStopWatch.ElapsedMilliseconds;
+
+
+        Console.WriteLine($"Elapsed Time of Object Sort in Array: {elapsedMilliseconds} ms");
+
+        Console.WriteLine($"Elapsed Time of Ojbect Sort in List: {elapsedMillisecondsOne} ms");
+
+        PrintCollection(sortedObjectArray.Where(data => data.Name == "Ella Thomas").ToList());
 
         // Start the stopwatch
         stopwatch.Start();
 
         // Call the method you want to benchmark
-        BubbleSort(array);
+        MyMethodToBenchmark();
 
-        // Stop the stopwatch
-        stopwatch.Stop();
-
-        // Get the elapsed time in milliseconds
-        long elapsedMillisecondsBubble = stopwatch.ElapsedMilliseconds;
-
-        // Output the elapsed time
-        Console.WriteLine($"Elapsed Time For Bubble: {elapsedMillisecondsBubble} ms");
-
-        stopwatch1.Start();
-
-        // Call the method you want to benchmark
-        Array.Sort(array2);
-
-        // Stop the stopwatch
-        stopwatch1.Stop();
-
-        // Get the elapsed time in milliseconds
-        long elapsedMillisecondsStandard = stopwatch1.ElapsedMilliseconds;
-
-        // Output the elapsed time
-        Console.WriteLine($"Elapsed Time For Standard: {elapsedMillisecondsStandard} ms");
-    }
-
-    static int[] BubbleSort(int[] array)
+    public static int[] BubbleSort(int[] array)
     {
         int[] sortedArray = array;
 
-        for (int row = 0; row < sortedArray.Length - 1; row++)
-        {
-            for (int col = 0; col < sortedArray.Length - row - 1; col++)
-            {
-                if (sortedArray[col] > sortedArray[col + 1 ])
-                {
-                    int temp = sortedArray[col];
-                    sortedArray[col] = sortedArray[col + 1];
-                    sortedArray[col + 1] = temp;
-                }
-            }
-        }
+        // Get the elapsed time in milliseconds
+        long elapsedMilliseconds = stopwatch.ElapsedMilliseconds;
 
-        return sortedArray;
+        // Output the elapsed time
+        Console.WriteLine($"Elapsed Time: {elapsedMilliseconds} ms");
+    }
+
+    static void MyMethodToBenchmark()
+    {
+        int sum = 0;
+        // Your code to benchmark here
+        for (int i = 0; i < 1000000; i++)
+        {
+            sum += i;
+        }
     }
 }
