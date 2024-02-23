@@ -7,30 +7,79 @@ class Program
     {
         // Create a Stopwatch instance
         Stopwatch stopwatch = new Stopwatch();
+        Stopwatch stopwatch1 = new Stopwatch();
+        int size = 10;
+
+        // Seed for the random number generator
+        Random random = new Random();
+
+        // Array to store random integers
+        int[] array = new int[size];
+
+        Enumerable.Range(0, size).Select<int, object>(x => { Console.WriteLine(x); return null; });
+
+        // Fill the array with random integers
+        for (int i = 0; i < size; i++)
+        {
+            array[i] = random.Next(); // Generate a random integer
+        }
+
+        int[] array2 = new int[size];
+
+        for (int i = 0; i < size; i++)
+        {
+            array2[i] = random.Next();
+        }
+
+        BubbleSort(array);
 
         // Start the stopwatch
         stopwatch.Start();
 
         // Call the method you want to benchmark
-        MyMethodToBenchmark();
+        BubbleSort(array);
 
         // Stop the stopwatch
         stopwatch.Stop();
 
         // Get the elapsed time in milliseconds
-        long elapsedMilliseconds = stopwatch.ElapsedMilliseconds;
+        long elapsedMillisecondsBubble = stopwatch.ElapsedMilliseconds;
 
         // Output the elapsed time
-        Console.WriteLine($"Elapsed Time: {elapsedMilliseconds} ms");
+        Console.WriteLine($"Elapsed Time For Bubble: {elapsedMillisecondsBubble} ms");
+
+        stopwatch1.Start();
+
+        // Call the method you want to benchmark
+        Array.Sort(array2);
+
+        // Stop the stopwatch
+        stopwatch1.Stop();
+
+        // Get the elapsed time in milliseconds
+        long elapsedMillisecondsStandard = stopwatch1.ElapsedMilliseconds;
+
+        // Output the elapsed time
+        Console.WriteLine($"Elapsed Time For Standard: {elapsedMillisecondsStandard} ms");
     }
 
-    static void MyMethodToBenchmark()
+    static int[] BubbleSort(int[] array)
     {
-        int sum = 0;
-        // Your code to benchmark here
-        for (int i = 0; i < 1000000; i++)
+        int[] sortedArray = array;
+
+        for (int row = 0; row < sortedArray.Length - 1; row++)
         {
-            sum += i;
+            for (int col = 0; col < sortedArray.Length - row - 1; col++)
+            {
+                if (sortedArray[col] > sortedArray[col + 1 ])
+                {
+                    int temp = sortedArray[col];
+                    sortedArray[col] = sortedArray[col + 1];
+                    sortedArray[col + 1] = temp;
+                }
+            }
         }
+
+        return sortedArray;
     }
 }
